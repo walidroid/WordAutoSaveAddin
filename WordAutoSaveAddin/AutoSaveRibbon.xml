@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load">
+  <ribbon>
+    <tabs>
+      <tab id="autoSaveTab" label="Auto-Save">
+        <group id="autoSaveGroup" label="Auto-Save">
+          <toggleButton
+            id="toggleButton"
+            label="Auto-Save ON"
+            screentip="Toggle Auto-Save"
+            supertip="Automatically saves your document every 10 seconds."
+            size="large"
+            getPressed="GetToggleButtonPressed"
+            onAction="OnToggleButton_Click" />
+          <labelControl
+            id="statusLabel"
+            getLabel="GetStatusLabel" />
+        </group>
+      </tab>
+    </tabs>
+  </ribbon>
+</customUI>

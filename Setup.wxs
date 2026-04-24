@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
-     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
   <Product Id="*"
            Name="Word Auto-Save Add-in"
@@ -28,77 +27,50 @@
   </Fragment>
 
   <Fragment>
+    <!-- DLL installed to %LOCALAPPDATA%\WordAutoSaveAddin\ -->
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-
       <Component Id="MainDll" Guid="34567890-3456-3456-3456-345678901234">
         <File Id="WordAutoSaveAddin.dll"
               Source="WordAutoSaveAddin\bin\Release\WordAutoSaveAddin.dll"
               KeyPath="yes" />
-
-        <!-- Register the COM add-in DLL via RegAsm on install -->
-        <util:XmlFile Id="dummy" Action="createElement"
-                      File="[INSTALLFOLDER]dummy.xml"
-                      ElementPath="/"
-                      Name="dummy"
-                      Sequence="1"
-                      Condition="1=0" />
       </Component>
-
-      <!-- RegAsm: register on install, unregister on remove -->
-      <Component Id="RegAsmRegister" Guid="AABBCCDD-AABB-CCDD-AABB-AABBCCDDEEFF"
-                 Directory="INSTALLFOLDER">
-        <RegistryValue Root="HKCU"
-                       Key="SOFTWARE\WordAutoSaveAddin\Installed"
-                       Name="Version" Type="string" Value="1.0.0.0"
-                       KeyPath="yes" />
-
-        <util:XmlFile Id="dummy2" Action="createElement"
-                      File="[INSTALLFOLDER]dummy2.xml"
-                      ElementPath="/"
-                      Name="dummy2"
-                      Sequence="1"
-                      Condition="1=0" />
-      </Component>
-
     </ComponentGroup>
 
-    <!-- Word add-in registry entries (HKCU — no admin needed) -->
+    <!-- All registry entries written under HKCU (no admin rights needed) -->
     <DirectoryRef Id="TARGETDIR">
       <Component Id="RegistryEntries" Guid="78901234-7890-7890-7890-789012345678">
-        <!-- COM class registration (HKCU — no admin needed) -->
-        <RegistryKey Root="HKCU"
-                     Key="SOFTWARE\Classes\WordAutoSaveAddin.Connect">
-          <RegistryValue Type="string" Value="Word Auto-Save Add-in" />
+
+        <!-- COM ProgId -->
+        <RegistryKey Root="HKCU" Key="SOFTWARE\Classes\WordAutoSaveAddin.Connect">
+          <RegistryValue Type="string" Value="Word Auto-Save Add-in" KeyPath="yes" />
         </RegistryKey>
-        <RegistryKey Root="HKCU"
-                     Key="SOFTWARE\Classes\WordAutoSaveAddin.Connect\CLSID">
+        <RegistryKey Root="HKCU" Key="SOFTWARE\Classes\WordAutoSaveAddin.Connect\CLSID">
           <RegistryValue Type="string" Value="{B2C3D4E5-F678-9012-BCDE-F12345678901}" />
         </RegistryKey>
-        <RegistryKey Root="HKCU"
-                     Key="SOFTWARE\Classes\CLSID\{B2C3D4E5-F678-9012-BCDE-F12345678901}">
+
+        <!-- COM CLSID — tells .NET/mscoree where to load the assembly from -->
+        <RegistryKey Root="HKCU" Key="SOFTWARE\Classes\CLSID\{B2C3D4E5-F678-9012-BCDE-F12345678901}">
           <RegistryValue Type="string" Value="Word Auto-Save Add-in" />
         </RegistryKey>
-        <RegistryKey Root="HKCU"
-                     Key="SOFTWARE\Classes\CLSID\{B2C3D4E5-F678-9012-BCDE-F12345678901}\InprocServer32">
+        <RegistryKey Root="HKCU" Key="SOFTWARE\Classes\CLSID\{B2C3D4E5-F678-9012-BCDE-F12345678901}\InprocServer32">
           <RegistryValue Type="string" Value="mscoree.dll" />
           <RegistryValue Type="string" Name="ThreadingModel" Value="Both" />
-          <RegistryValue Type="string" Name="Class" Value="WordAutoSaveAddin.Connect" />
-          <RegistryValue Type="string" Name="Assembly" Value="WordAutoSaveAddin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <RegistryValue Type="string" Name="Class"          Value="WordAutoSaveAddin.Connect" />
+          <RegistryValue Type="string" Name="Assembly"       Value="WordAutoSaveAddin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319" />
-          <RegistryValue Type="string" Name="CodeBase" Value="file:///[INSTALLFOLDER]WordAutoSaveAddin.dll" />
+          <RegistryValue Type="string" Name="CodeBase"       Value="file:///[INSTALLFOLDER]WordAutoSaveAddin.dll" />
         </RegistryKey>
-        <RegistryKey Root="HKCU"
-                     Key="SOFTWARE\Classes\CLSID\{B2C3D4E5-F678-9012-BCDE-F12345678901}\ProgId">
+        <RegistryKey Root="HKCU" Key="SOFTWARE\Classes\CLSID\{B2C3D4E5-F678-9012-BCDE-F12345678901}\ProgId">
           <RegistryValue Type="string" Value="WordAutoSaveAddin.Connect" />
         </RegistryKey>
 
-        <!-- Word add-in registration -->
-        <RegistryKey Root="HKCU"
-                     Key="SOFTWARE\Microsoft\Office\Word\Addins\WordAutoSaveAddin.Connect">
-          <RegistryValue Type="string"  Name="FriendlyName"  Value="Word Auto-Save Add-in" />
-          <RegistryValue Type="string"  Name="Description"   Value="Automatically saves the active Word document every 10 seconds." />
-          <RegistryValue Type="integer" Name="LoadBehavior"  Value="3" />
+        <!-- Word add-in entry — LoadBehavior 3 = load at startup -->
+        <RegistryKey Root="HKCU" Key="SOFTWARE\Microsoft\Office\Word\Addins\WordAutoSaveAddin.Connect">
+          <RegistryValue Type="string"  Name="FriendlyName" Value="Word Auto-Save Add-in" />
+          <RegistryValue Type="string"  Name="Description"  Value="Automatically saves the active Word document every 10 seconds." />
+          <RegistryValue Type="integer" Name="LoadBehavior" Value="3" />
         </RegistryKey>
+
       </Component>
     </DirectoryRef>
   </Fragment>

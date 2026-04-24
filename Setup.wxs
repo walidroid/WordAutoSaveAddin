@@ -1,56 +1,105 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="*" Name="Word Auto-Save Add-in" Language="1033" Version="1.0.0.0" Manufacturer="Walidroid" UpgradeCode="12345678-1234-1234-1234-123456789012">
-        <Package InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 
-        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-        <MediaTemplate EmbedCab="yes" />
+  <Product Id="*"
+           Name="Word Auto-Save Add-in"
+           Language="1033"
+           Version="1.0.0.0"
+           Manufacturer="Walidroid"
+           UpgradeCode="12345678-1234-1234-1234-123456789012">
 
-        <Feature Id="ProductFeature" Title="Word Auto-Save Add-in" Level="1">
-            <ComponentGroupRef Id="ProductComponents" />
-            <ComponentRef Id="RegistryEntries" />
-        </Feature>
-    </Product>
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
 
-    <Fragment>
-        <Directory Id="TARGETDIR" Name="SourceDir">
-            <Directory Id="LocalAppDataFolder">
-                <Directory Id="INSTALLFOLDER" Name="WordAutoSaveAddin" />
-            </Directory>
-        </Directory>
-    </Fragment>
+    <Feature Id="ProductFeature" Title="Word Auto-Save Add-in" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="RegistryEntries" />
+    </Feature>
+  </Product>
 
-    <Fragment>
-        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-            <!-- VSTO files -->
-            <Component Id="WordAutoSaveAddin_vsto" Guid="23456789-2345-2345-2345-234567890123">
-                <File Id="WordAutoSaveAddin.vsto" Source="WordAutoSaveAddin\bin\Release\WordAutoSaveAddin.vsto" KeyPath="yes" />
-            </Component>
-            <Component Id="WordAutoSaveAddin_dll" Guid="34567890-3456-3456-3456-345678901234">
-                <File Id="WordAutoSaveAddin.dll" Source="WordAutoSaveAddin\bin\Release\WordAutoSaveAddin.dll" KeyPath="yes" />
-            </Component>
-            <Component Id="WordAutoSaveAddin_dll_manifest" Guid="45678901-4567-4567-4567-456789012345">
-                <File Id="WordAutoSaveAddin.dll.manifest" Source="WordAutoSaveAddin\bin\Release\WordAutoSaveAddin.dll.manifest" KeyPath="yes" />
-            </Component>
-            
-            <!-- VSTO Utilities -->
-            <Component Id="Microsoft.Office.Tools.Common.v4.0.Utilities.dll" Guid="56789012-5678-5678-5678-567890123456">
-                <File Id="Microsoft.Office.Tools.Common.v4.0.Utilities.dll" Source="WordAutoSaveAddin\bin\Release\Microsoft.Office.Tools.Common.v4.0.Utilities.dll" KeyPath="yes" />
-            </Component>
-            <Component Id="Microsoft.Office.Tools.Word.v4.0.Utilities.dll" Guid="67890123-6789-6789-6789-678901234567">
-                <File Id="Microsoft.Office.Tools.Word.v4.0.Utilities.dll" Source="WordAutoSaveAddin\bin\Release\Microsoft.Office.Tools.Word.v4.0.Utilities.dll" KeyPath="yes" />
-            </Component>
-        </ComponentGroup>
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="LocalAppDataFolder">
+        <Directory Id="INSTALLFOLDER" Name="WordAutoSaveAddin" />
+      </Directory>
+    </Directory>
+  </Fragment>
 
-        <DirectoryRef Id="TARGETDIR">
-            <Component Id="RegistryEntries" Guid="78901234-7890-7890-7890-789012345678">
-                <RegistryKey Root="HKCU" Key="SOFTWARE\Microsoft\Office\Word\Addins\WordAutoSaveAddin">
-                    <RegistryValue Type="string" Name="FriendlyName" Value="Word Auto-Save Add-in" />
-                    <RegistryValue Type="string" Name="Description" Value="Automatically saves the active Word document every 10 seconds." />
-                    <RegistryValue Type="integer" Name="LoadBehavior" Value="3" />
-                    <RegistryValue Type="string" Name="Manifest" Value="[INSTALLFOLDER]WordAutoSaveAddin.vsto|vstolocal" />
-                </RegistryKey>
-            </Component>
-        </DirectoryRef>
-    </Fragment>
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+
+      <Component Id="MainDll" Guid="34567890-3456-3456-3456-345678901234">
+        <File Id="WordAutoSaveAddin.dll"
+              Source="WordAutoSaveAddin\bin\Release\WordAutoSaveAddin.dll"
+              KeyPath="yes" />
+
+        <!-- Register the COM add-in DLL via RegAsm on install -->
+        <util:XmlFile Id="dummy" Action="createElement"
+                      File="[INSTALLFOLDER]dummy.xml"
+                      ElementPath="/"
+                      Name="dummy"
+                      Sequence="1"
+                      Condition="1=0" />
+      </Component>
+
+      <!-- RegAsm: register on install, unregister on remove -->
+      <Component Id="RegAsmRegister" Guid="AABBCCDD-AABB-CCDD-AABB-AABBCCDDEEFF"
+                 Directory="INSTALLFOLDER">
+        <RegistryValue Root="HKCU"
+                       Key="SOFTWARE\WordAutoSaveAddin\Installed"
+                       Name="Version" Type="string" Value="1.0.0.0"
+                       KeyPath="yes" />
+
+        <util:XmlFile Id="dummy2" Action="createElement"
+                      File="[INSTALLFOLDER]dummy2.xml"
+                      ElementPath="/"
+                      Name="dummy2"
+                      Sequence="1"
+                      Condition="1=0" />
+      </Component>
+
+    </ComponentGroup>
+
+    <!-- Word add-in registry entries (HKCU — no admin needed) -->
+    <DirectoryRef Id="TARGETDIR">
+      <Component Id="RegistryEntries" Guid="78901234-7890-7890-7890-789012345678">
+        <!-- COM class registration (HKCU — no admin needed) -->
+        <RegistryKey Root="HKCU"
+                     Key="SOFTWARE\Classes\WordAutoSaveAddin.Connect">
+          <RegistryValue Type="string" Value="Word Auto-Save Add-in" />
+        </RegistryKey>
+        <RegistryKey Root="HKCU"
+                     Key="SOFTWARE\Classes\WordAutoSaveAddin.Connect\CLSID">
+          <RegistryValue Type="string" Value="{B2C3D4E5-F678-9012-BCDE-F12345678901}" />
+        </RegistryKey>
+        <RegistryKey Root="HKCU"
+                     Key="SOFTWARE\Classes\CLSID\{B2C3D4E5-F678-9012-BCDE-F12345678901}">
+          <RegistryValue Type="string" Value="Word Auto-Save Add-in" />
+        </RegistryKey>
+        <RegistryKey Root="HKCU"
+                     Key="SOFTWARE\Classes\CLSID\{B2C3D4E5-F678-9012-BCDE-F12345678901}\InprocServer32">
+          <RegistryValue Type="string" Value="mscoree.dll" />
+          <RegistryValue Type="string" Name="ThreadingModel" Value="Both" />
+          <RegistryValue Type="string" Name="Class" Value="WordAutoSaveAddin.Connect" />
+          <RegistryValue Type="string" Name="Assembly" Value="WordAutoSaveAddin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319" />
+          <RegistryValue Type="string" Name="CodeBase" Value="file:///[INSTALLFOLDER]WordAutoSaveAddin.dll" />
+        </RegistryKey>
+        <RegistryKey Root="HKCU"
+                     Key="SOFTWARE\Classes\CLSID\{B2C3D4E5-F678-9012-BCDE-F12345678901}\ProgId">
+          <RegistryValue Type="string" Value="WordAutoSaveAddin.Connect" />
+        </RegistryKey>
+
+        <!-- Word add-in registration -->
+        <RegistryKey Root="HKCU"
+                     Key="SOFTWARE\Microsoft\Office\Word\Addins\WordAutoSaveAddin.Connect">
+          <RegistryValue Type="string"  Name="FriendlyName"  Value="Word Auto-Save Add-in" />
+          <RegistryValue Type="string"  Name="Description"   Value="Automatically saves the active Word document every 10 seconds." />
+          <RegistryValue Type="integer" Name="LoadBehavior"  Value="3" />
+        </RegistryKey>
+      </Component>
+    </DirectoryRef>
+  </Fragment>
 </Wix>

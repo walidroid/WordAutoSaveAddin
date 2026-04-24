@@ -1,0 +1,21 @@
+Windows Registry Editor Version 5.00
+
+; ============================================================
+;  WordAutoSaveAddin – Per-User Registry Registration
+;  Run this file AFTER building the project.
+;
+;  Replace  C:\YourPath\WordAutoSaveAddin\bin\Release\
+;  with the actual path to your build output folder.
+; ============================================================
+
+; ── Register the add-in with Word ───────────────────────────
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Office\Word\Addins\WordAutoSaveAddin]
+"Description"="Automatically saves the active Word document every 10 seconds."
+"FriendlyName"="Word Auto-Save Add-in"
+"LoadBehavior"=dword:00000003
+"Manifest"="C:\\YourPath\\WordAutoSaveAddin\\bin\\Release\\WordAutoSaveAddin.vsto|vstolocal"
+
+; ── (Optional) Mark as trusted for all users ────────────────
+; If you see a security warning, also add:
+; [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Office\16.0\WEF\TrustedCatalogs]
+; (not needed for vstolocal installs in most configurations)

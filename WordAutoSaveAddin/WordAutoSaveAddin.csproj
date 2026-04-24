@@ -2,7 +2,6 @@
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <ProjectTypeGuids>{BAA0C2D2-18E2-41B9-852F-F413020CAA33};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}</ProjectGuid>
@@ -12,15 +11,6 @@
     <AssemblyName>WordAutoSaveAddin</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <OfficeApplication>Word</OfficeApplication>
-    <SupportUrl />
-    <FriendlyName>Word Auto-Save Add-in</FriendlyName>
-    <OfficeApplicationDescription>Automatically saves the active Word document every 10 seconds.</OfficeApplicationDescription>
-    <LoadBehavior>3</LoadBehavior>
-    <SignManifests>true</SignManifests>
-    <ManifestCertificateThumbprint></ManifestCertificateThumbprint>
-    <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,38 +31,25 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.Office.Tools.Common">
-      <HintPath>$(ProgramFiles(x86))\Reference Assemblies\Microsoft\VSTO40\v4.0.Framework\Microsoft.Office.Tools.Common.dll</HintPath>
+    <!-- IDTExtensibility2 interface -->
+    <Reference Include="Extensibility">
+      <HintPath>$(ProgramFiles(x86))\Microsoft Visual Studio\Shared\Visual Studio Tools for Office\PIA\Common\Extensibility.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Office.Tools.Word">
-      <HintPath>$(ProgramFiles(x86))\Reference Assemblies\Microsoft\VSTO40\v4.0.Framework\Microsoft.Office.Tools.Word.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Office.Tools">
-      <HintPath>$(ProgramFiles(x86))\Reference Assemblies\Microsoft\VSTO40\v4.0.Framework\Microsoft.Office.Tools.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Tools.Applications.Runtime">
-      <HintPath>$(ProgramFiles(x86))\Reference Assemblies\Microsoft\VSTO40\v4.0.Framework\Microsoft.VisualStudio.Tools.Applications.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Office.Interop.Word">
-      <HintPath>$(ProgramFiles(x86))\Microsoft Visual Studio\Shared\Visual Studio Tools for Office\PIA\Office15\Microsoft.Office.Interop.Word.dll</HintPath>
-    </Reference>
-    <Reference Include="stdole">
-      <HintPath>$(ProgramFiles(x86))\Microsoft Visual Studio\Shared\Visual Studio Tools for Office\PIA\Common\stdole.dll</HintPath>
-    </Reference>
+    <!-- IRibbonExtensibility interface (office.dll) -->
     <Reference Include="office">
       <HintPath>$(ProgramFiles(x86))\Microsoft Visual Studio\Shared\Visual Studio Tools for Office\PIA\Office15\office.dll</HintPath>
     </Reference>
+    <!-- Word interop -->
+    <Reference Include="Microsoft.Office.Interop.Word">
+      <HintPath>$(ProgramFiles(x86))\Microsoft Visual Studio\Shared\Visual Studio Tools for Office\PIA\Office15\Microsoft.Office.Interop.Word.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Connect.cs" />
     <Compile Include="AutoSaveManager.cs" />
-    <Compile Include="AutoSaveRibbon.cs" />
-    <Compile Include="AutoSaveRibbon.Designer.cs" />
-    <Compile Include="ThisAddIn.cs" />
-    <Compile Include="ThisAddIn.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -84,5 +61,4 @@
     <Content Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\OfficeTools\Microsoft.VisualStudio.Tools.Office.targets" />
 </Project>

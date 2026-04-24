@@ -6,7 +6,7 @@ using Word = Microsoft.Office.Interop.Word;
 
 namespace WordAutoSaveAddin
 {
-    public partial class ThisAddIn
+    public partial class ThisAddIn : Microsoft.Office.Tools.Word.AddInBase
     {
         private AutoSaveManager _autoSaveManager;
 

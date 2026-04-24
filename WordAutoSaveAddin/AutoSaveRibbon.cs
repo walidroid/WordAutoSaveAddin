@@ -7,7 +7,7 @@ using Office = Microsoft.Office.Core;
 namespace WordAutoSaveAddin
 {
     [ComVisible(true)]
-    public class AutoSaveRibbon : Office.IRibbonExtensibility
+    public partial class AutoSaveRibbon : Office.IRibbonExtensibility
     {
         private Office.IRibbonUI _ribbon;
 

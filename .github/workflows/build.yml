@@ -1,0 +1,57 @@
+name: Build VSTO Add-in and MSI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    - name: Restore NuGet Packages
+      run: nuget restore WordAutoSaveAddin.sln
+
+    - name: Generate Self-Signed Certificate for ClickOnce Signing
+      shell: pwsh
+      run: |
+        $cert = New-SelfSignedCertificate `
+          -Subject "CN=WordAutoSaveAddin Dev" `
+          -CertStoreLocation "Cert:\CurrentUser\My" `
+          -KeyExportPolicy Exportable `
+          -KeyAlgorithm RSA `
+          -KeyLength 2048 `
+          -HashAlgorithm SHA256 `
+          -Type CodeSigningCert
+        
+        echo "CERT_THUMBPRINT=$($cert.Thumbprint)" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+    - name: Build VSTO Project
+      run: |
+        msbuild WordAutoSaveAddin.sln /p:Configuration=Release /p:Platform="Any CPU" /p:SignManifests=true /p:ManifestCertificateThumbprint=${{ env.CERT_THUMBPRINT }}
+
+    - name: Add WiX to PATH
+      shell: pwsh
+      run: echo "${env:WIX}bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+    - name: Build MSI Installer
+      run: |
+        candle Setup.wxs -ext WixUIExtension
+        light Setup.wixobj -ext WixUIExtension -o WordAutoSaveAddin.msi
+
+    - name: Upload MSI Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: WordAutoSaveAddin-Installer
+        path: WordAutoSaveAddin.msi

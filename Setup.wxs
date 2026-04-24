@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="*" Name="Word Auto-Save Add-in" Language="1033" Version="1.0.0.0" Manufacturer="Walidroid" UpgradeCode="12345678-1234-1234-1234-123456789012">
+        <Package InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
+
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+        <MediaTemplate EmbedCab="yes" />
+
+        <Feature Id="ProductFeature" Title="Word Auto-Save Add-in" Level="1">
+            <ComponentGroupRef Id="ProductComponents" />
+            <ComponentRef Id="RegistryEntries" />
+        </Feature>
+    </Product>
+
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="LocalAppDataFolder">
+                <Directory Id="INSTALLFOLDER" Name="WordAutoSaveAddin" />
+            </Directory>
+        </Directory>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <!-- VSTO files -->
+            <Component Id="WordAutoSaveAddin_vsto" Guid="23456789-2345-2345-2345-234567890123">
+                <File Id="WordAutoSaveAddin.vsto" Source="WordAutoSaveAddin\bin\Release\WordAutoSaveAddin.vsto" KeyPath="yes" />
+            </Component>
+            <Component Id="WordAutoSaveAddin_dll" Guid="34567890-3456-3456-3456-345678901234">
+                <File Id="WordAutoSaveAddin.dll" Source="WordAutoSaveAddin\bin\Release\WordAutoSaveAddin.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="WordAutoSaveAddin_dll_manifest" Guid="45678901-4567-4567-4567-456789012345">
+                <File Id="WordAutoSaveAddin.dll.manifest" Source="WordAutoSaveAddin\bin\Release\WordAutoSaveAddin.dll.manifest" KeyPath="yes" />
+            </Component>
+            
+            <!-- VSTO Utilities -->
+            <Component Id="Microsoft.Office.Tools.Common.v4.0.Utilities.dll" Guid="56789012-5678-5678-5678-567890123456">
+                <File Id="Microsoft.Office.Tools.Common.v4.0.Utilities.dll" Source="WordAutoSaveAddin\bin\Release\Microsoft.Office.Tools.Common.v4.0.Utilities.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="Microsoft.Office.Tools.Word.v4.0.Utilities.dll" Guid="67890123-6789-6789-6789-678901234567">
+                <File Id="Microsoft.Office.Tools.Word.v4.0.Utilities.dll" Source="WordAutoSaveAddin\bin\Release\Microsoft.Office.Tools.Word.v4.0.Utilities.dll" KeyPath="yes" />
+            </Component>
+        </ComponentGroup>
+
+        <DirectoryRef Id="TARGETDIR">
+            <Component Id="RegistryEntries" Guid="78901234-7890-7890-7890-789012345678">
+                <RegistryKey Root="HKCU" Key="SOFTWARE\Microsoft\Office\Word\Addins\WordAutoSaveAddin">
+                    <RegistryValue Type="string" Name="FriendlyName" Value="Word Auto-Save Add-in" />
+                    <RegistryValue Type="string" Name="Description" Value="Automatically saves the active Word document every 10 seconds." />
+                    <RegistryValue Type="integer" Name="LoadBehavior" Value="3" />
+                    <RegistryValue Type="string" Name="Manifest" Value="[INSTALLFOLDER]WordAutoSaveAddin.vsto|vstolocal" />
+                </RegistryKey>
+            </Component>
+        </DirectoryRef>
+    </Fragment>
+</Wix>
